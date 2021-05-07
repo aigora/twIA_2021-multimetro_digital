@@ -1,6 +1,7 @@
 //Roberto Vázquez Magdaleno y Gema Sánchez Sánchez
 //Iria Touriño = función calcular resistencia entre otras cosas
 //Alejandro Mayor = pantalla lcd entre otras cosas
+//Ines Rico y Raquel Roca = funcion calcular voltaje entre otras cosas
 
 #include <LiquidCrystal_I2C.h>
 #include<Wire.h>
@@ -134,5 +135,39 @@ void medir_resistencia(void)
   
   delay(1000);
   }
+  
+  
+void medir_voltaje(void)
+{ 
+  float voltaje_entrada = 5;
+  float voltaje_final;
+  float resistencia1 = 100000; //Resistencia de 100K
+  float resistencia2 = 0; //Resistencia de 10k
+  float VR2;
+
+  float lectura = analogRead(A2);
+
+  void setup() {
+
+  pinMode(pin_lectura, INPUT);
+  lcd.begin(0,0);
+
+  }
+
+  void loop() {
+
+  VR2 = (lectura * voltaje_entrada) / 1024;  //Lee el voltaje de entrada
+  voltaje_final = VR2 / (resistencia2 / (resistencia1 + resistencia2));  //Fórmula del divisor resistivo para el voltaje final
+
+  lcd.setCursor(0,0);
+  lcd.print("Voltaje DC:");
+
+  lcd.setCursor(0,1);
+  lcd.print(voltaje_final);  //Muestra el voltaje final
+  delay(500);
+  }
+  
+  }
+    
 }
 
