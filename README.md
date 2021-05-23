@@ -35,7 +35,7 @@ Fuentes: https://naylampmechatronics.com/blog/48_tutorial-sensor-de-corriente-ac
 
 ### Módulo cargador de batería  
 Un cargador para baterías litio, TP4056, permite conectarle una fuente de energía eléctrica a su entrada y una batería a su salida para que pueda cargarse. 
-El TP4056 es un chip encapsulado en formato SOP-8, adecua la entrada de energía para el estándar 1A y también puede controlar la temperatura. tambien habria falta para su funcionamiento, un puerto miniUSB para alimentar la batería a través de cables, LEDs de carga y de completado que avisan cuando está cargado y cuando se ha terminado el proceso, y BAT+/BAT- que son bornes de salida que irán conectados a los bornes de la batería que necesitamos cargar.
+El TP4056 es un chip encapsulado en formato SOP-8, adecua la entrada de energía para el estándar 1A y también puede controlar la temperatura. Además, para su funcionamiento, hace falta un puerto miniUSB para alimentar la batería a través de cables, LEDs de carga y de completado que avisan cuando está cargado y cuando se ha terminado el proceso, y BAT+/BAT- que son bornes de salida que irán conectados a los bornes de la batería que necesitamos cargar.
 fuente:https://www.hwlibre.com/tp4056/
 
 ### Pulsadores  
