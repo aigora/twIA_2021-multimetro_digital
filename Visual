@@ -18,9 +18,11 @@ int menu_principal(void);
 void leer_corriente(Serial* Arduino);
 void leer_voltaje(Serial* Arduino);
 void leer_resistencia(Serial* Arduino);
+/*
 void fichero1(FILE*, float);
 void fichero2(FILE*, float);
 void fichero3(FILE*, float);
+*/
 
 void Send_to_hw(Serial*, char*);
 int Receive_from_hw(Serial* Arduino, char* BufferEntrada);
@@ -76,10 +78,10 @@ int menu_principal(void)
 		printf("2 - MEDIR VOLTAJE\n");
 		printf("3 - MEDIR RESISTENCIA\n");
 		printf("4 - CERRAR\n");
-		printf("Seleccione opción:");
+		printf("Seleccione opcion:");
 		scanf_s("%d", &opcion);
 		if (opcion < 1 || opcion>3)
-			printf("\nOpción inexistente.\n\n");
+			printf("\nOpcion inexistente.\n\n");
 	} while (opcion < 1 || opcion>3);
 	return opcion;
 }
@@ -142,7 +144,7 @@ void leer_corriente(Serial* Arduino)
 	int bytesrecibidos;
 	float corriente;
 	char BufferEntrada[MAX_BUFFER];
-	FILE* f;
+	//FILE* f;
 
 	if (Arduino->IsConnected()) // Si hay conexión con Arduino 
 	{
@@ -152,12 +154,12 @@ void leer_corriente(Serial* Arduino)
 		else
 		{
 			printf("Mensaje recibido %s %d\n", BufferEntrada, corriente);
-			fichero3(f, corriente);
+			//fichero3(f, corriente);
 		}
 			
 	}
 	else
-		printf("La comunicación con la plataforma hardware no es posible en este momento\n");
+		printf("La comunicacion con la plataforma hardware no es posible en este momento\n");
 }
 
 void leer_voltaje(Serial* Arduino)
@@ -165,7 +167,7 @@ void leer_voltaje(Serial* Arduino)
 	int bytesrecibidos;
 	float voltaje;
 	char BufferEntrada[MAX_BUFFER];
-	FILE* f;
+	//FILE* f;
 
 	if (Arduino->IsConnected()) // Si hay conexión con Arduino 
 	{
@@ -175,12 +177,12 @@ void leer_voltaje(Serial* Arduino)
 		else
 		{
 			printf("Mensaje recibido %s %d\n", BufferEntrada, voltaje);
-			fichero1(f, voltaje);
+			//fichero1(&f, voltaje);
 		}
 			
 	}
 	else
-		printf("La comunicación con la plataforma hardware no es posible en este momento\n");
+		printf("La comunicacion con la plataforma hardware no es posible en este momento\n");
 }
 
 void leer_resistencia(Serial* Arduino)
@@ -188,7 +190,7 @@ void leer_resistencia(Serial* Arduino)
 	int bytesrecibidos;
 	float resistencia;
 	char BufferEntrada[MAX_BUFFER];
-	FILE* f;
+	//FILE* f;
 
 	if (Arduino->IsConnected()) // Si hay conexión con Arduino 
 	{
@@ -198,14 +200,15 @@ void leer_resistencia(Serial* Arduino)
 		else
 		{
 			printf("Mensaje recibido %s %d\n", BufferEntrada, resistencia);
-			fichero2(f, resistencia);
+			//fichero2(&f, resistencia);
 		}
 			
 	}
 	else
-		printf("La comunicación con la plataforma hardware no es posible en este momento\n");
+		printf("La comunicacion con la plataforma hardware no es posible en este momento\n");
 }
 
+/*
 void fichero1(FILE* f, float voltaje)
 {
 	errno_t err;
@@ -216,7 +219,7 @@ void fichero1(FILE* f, float voltaje)
 	else
 		printf("El archivo NO esta abierto\n");
 
-	fprintf(f, "VOLTAJE: %f", voltaje);
+	fprintf(&f, "VOLTAJE: %f", voltaje);
 
 	if (fclose(f) == NULL)
 		printf("\n Archivo cerrado correctamente");
@@ -259,3 +262,4 @@ void fichero3(FILE* f, float corriente)
 	else
 		printf("\n Error en el cierre del archivo");
 }
+*/
