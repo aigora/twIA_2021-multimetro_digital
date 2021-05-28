@@ -17,10 +17,17 @@ LiquidCrystal_I2C lcd(0x27, 16, 2); //direccion 0x20 || 0x27
                                     // 16 columnas 2 filas
                                     
 void mode(float*,float*,float*);
+
 void medir_corriente(float,float*);
 void medir_resistencia(float*);
 void medir_voltaje(float*);
-void procesar_mensaje(float);
+/*
+int medir_corriente(float);
+int medir_resistencia();
+int medir_voltaje();
+*/
+
+void procesar_mensaje(float*);
 
 void setup()
 {
@@ -42,19 +49,19 @@ void setup()
 
 void loop() 
 {
-  float*corriente=0.0,*resistencia=0.0,*voltaje=0.0;
+  float*corriente,*resistencia,*voltaje;
   
   if (Serial.available() > 0)
   {
-    mode(&corriente,&resistencia,&voltaje);
+    mode(corriente,resistencia,voltaje);
     if(*corriente!=0.0)
-        procesar_mensaje(*corriente);    
+        procesar_mensaje(corriente);    
     else
-        if(*resitencia!=0.0)
-           procesar_mensaje(*resistencia);    
+        if(*resistencia!=0.0)
+           procesar_mensaje(resistencia);   
         else
             if(*voltaje!=0.0)
-                procesar_mensaje(*voltaje);  
+                procesar_mensaje(voltaje);  
   }  
   
 }
@@ -67,9 +74,7 @@ void mode(float*corriente,float*resistencia,float*voltaje)
     estado2 = false;
     estado3 = false;
     if(estado1==true)
-    {
-      medir_voltaje(&voltaje);       //funcion de voltaje
-    }
+      medir_voltaje(voltaje);       //funcion de voltaje
   }
   if (digitalRead(boton_mi)==HIGH)
   {
@@ -78,9 +83,7 @@ void mode(float*corriente,float*resistencia,float*voltaje)
     estado1 = false;
     estado3 = false;
     if(estado2==true)
-    {
-      medir_corriente(voltajecorriente,&corriente);
-    }
+       medir_corriente(voltajecorriente,corriente);
   }
   if (digitalRead(boton_mr)==HIGH)
   {
@@ -88,85 +91,79 @@ void mode(float*corriente,float*resistencia,float*voltaje)
     estado1 = false;
     estado2 = false;
     if(estado3==true)
-    {
-        medir_resistencia(&resistencia);      //funcion de resistencia
-    }
+        medir_resistencia(resistencia);      //funcion de resistencia
   }
 }
 
-void medir_corriente(float v)
+void medir_corriente(float v,float *corriente)
 {
-   float corriente;
-
-  corriente=(v)/185;
+  *corriente=(v)/185.0;
 
   Serial.print("Corriente: ");
-  Serial.println(corriente);
+  Serial.println(*corriente);
 
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("CORRIENTE: ");
-  lcd.print(corriente,2);     //se imprimie en la lcd con dos decimales
+  lcd.print(*corriente,2);     //se imprimie en la lcd con dos decimales
   lcd.setCursor(0,1);                  
   lcd.print("amperios");
   
   delay(200);  
 }
 
-void medir_resistencia()      
+
+void medir_resistencia(float*R2)      
 {
   int PinA0 = 0;
   int lectura = 0;
   int Ve = 5; // Tensión en el Arduino.
-  float VR2 = 0;
   float R1 = 10000;
-  float R2 ;
+  float VR2;
   
   lectura = analogRead(PinA0);
   if (lectura)
   {
     VR2=(lectura*Ve)/1024.0;
-    R2 = (VR2*R1)/(Ve-VR2);
+    *R2 = (VR2*R1)/(Ve-VR2);
     
-    Serial.println(R2);
+    Serial.println(*R2);
     lcd.clear();
     lcd.setCursor(0,0);
     lcd.print("RESISTENCIA : ");
-    lcd.print(R2,2);     //se imprimie en la lcd con dos decimales
+    lcd.print(*R2,2);     //se imprimie en la lcd con dos decimales
     lcd.setCursor(0,1);
     lcd.print("ohmios");
   }
   
   delay(1000);
-  }
 }
 
-void medir_voltaje(float*VR2)
+void medir_voltaje(float*Ve)
 {
   int PinA0 = 0;
   int lectura = 0;
-  int Ve = 5; // Tensión en el Arduino.
+  float VR2;
   float R1 = 10000;
   float R2=220 ;
   
-  VR2=(Ve*R2)/(R1+R2);
   lectura = analogRead(PinA0);
   if (lectura)
   {
     VR2=(lectura*5.0)/1024.0;
-    Ve = VR2*(R1+R2)/R2;
+    *Ve = VR2*(R1+R2)/R2;
     
-    Serial.println(Ve);
+    Serial.println(*Ve);
     lcd.clear();
     lcd.setCursor(0,0);
     lcd.print("VOLTAJE: ");
-    lcd.print(VOLTAJE,2);     //se imprimie en la lcd con dos decimales
+    lcd.print(*Ve,2);     //se imprimie en la lcd con dos decimales
     lcd.setCursor(0,1);       
     lcd.print("voltios");
   }
 }
 
-void procesar_mensaje(float medida)
+void procesar_mensaje(float *medida)
 {
   String cadena = Serial.readStringUntil('\n'); // Lee mensaje
   //String valor = Serial.readStringUntil('\n');  // Lee valor
