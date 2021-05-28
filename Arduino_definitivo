@@ -51,9 +51,12 @@ void loop()
 {
   float*corriente,*resistencia,*voltaje;
   
+  mode(corriente,resistencia,voltaje);
+  
   if (Serial.available() > 0)
   {
-    mode(corriente,resistencia,voltaje);
+    //mode(corriente,resistencia,voltaje);
+    
     if(*corriente!=0.0)
         procesar_mensaje(corriente);    
     else
