@@ -1,0 +1,195 @@
+#include <LiquidCrystal_I2C.h>
+#include<Wire.h>
+
+#define Sensibilidad 0.185; //sensibilidad en Voltios/Amperio para sensor de 5A
+
+//Varios pulsadores para elegir lo que se mide
+int boton_mv=3;
+int boton_mi=4;
+int boton_mr=5;
+
+//para mentener el estado
+bool estado1 = false;
+bool estado2 = false;
+bool estado3 = false;
+
+LiquidCrystal_I2C lcd(0x27, 16, 2); //direccion 0x20 || 0x27
+                                    // 16 columnas 2 filas
+                                    
+void mode(float*,float*,float*);
+void medir_corriente(float,float*);
+void medir_resistencia(float*);
+void medir_voltaje(float*);
+void procesar_mensaje(float);
+
+void setup()
+{
+  pinMode(boton_mv,INPUT);
+  pinMode(boton_mi,INPUT);
+  pinMode(boton_mr,INPUT);
+
+  lcd.init();              //inicializar        
+  lcd.backlight();          //la luz pantalla se encienda
+  lcd.setCursor(0, 0);      //posicion inicial pantalla
+  lcd.print("MULTIMETRO");
+  lcd.setCursor(0, 1);
+  lcd.print("DIGITAL");
+  delay(4000);
+  lcd.clear();
+
+  Serial.begin(9600);
+}
+
+void loop() 
+{
+  float*corriente=0.0,*resistencia=0.0,*voltaje=0.0;
+  
+  if (Serial.available() > 0)
+  {
+    mode(&corriente,&resistencia,&voltaje);
+    if(*corriente!=0.0)
+        procesar_mensaje(*corriente);    
+    else
+        if(*resitencia!=0.0)
+           procesar_mensaje(*resistencia);    
+        else
+            if(*voltaje!=0.0)
+                procesar_mensaje(*voltaje);  
+  }  
+  
+}
+
+void mode(float*corriente,float*resistencia,float*voltaje)
+{  
+  if (digitalRead(boton_mv)==HIGH)
+  {
+    estado1 = !estado1;
+    estado2 = false;
+    estado3 = false;
+    if(estado1==true)
+    {
+      medir_voltaje(&voltaje);       //funcion de voltaje
+    }
+  }
+  if (digitalRead(boton_mi)==HIGH)
+  {
+    float voltajecorriente = analogRead(A0)* (5.0 / 1023.0);
+    estado2 = !estado2;
+    estado1 = false;
+    estado3 = false;
+    if(estado2==true)
+    {
+      medir_corriente(voltajecorriente,&corriente);
+    }
+  }
+  if (digitalRead(boton_mr)==HIGH)
+  {
+    estado3 = !estado3;
+    estado1 = false;
+    estado2 = false;
+    if(estado3==true)
+    {
+        medir_resistencia(&resistencia);      //funcion de resistencia
+    }
+  }
+}
+
+void medir_corriente(float v)
+{
+   float corriente;
+
+  corriente=(v)/185;
+
+  Serial.print("Corriente: ");
+  Serial.println(corriente);
+
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("CORRIENTE: ");
+  lcd.print(corriente,2);     //se imprimie en la lcd con dos decimales
+  lcd.setCursor(0,1);                  
+  lcd.print("amperios");
+  
+  delay(200);  
+}
+
+void medir_resistencia()      
+{
+  int PinA0 = 0;
+  int lectura = 0;
+  int Ve = 5; // Tensión en el Arduino.
+  float VR2 = 0;
+  float R1 = 10000;
+  float R2 ;
+  
+  lectura = analogRead(PinA0);
+  if (lectura)
+  {
+    VR2=(lectura*Ve)/1024.0;
+    R2 = (VR2*R1)/(Ve-VR2);
+    
+    Serial.println(R2);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("RESISTENCIA : ");
+    lcd.print(R2,2);     //se imprimie en la lcd con dos decimales
+    lcd.setCursor(0,1);
+    lcd.print("ohmios");
+  }
+  
+  delay(1000);
+  }
+}
+
+void medir_voltaje(float*VR2)
+{
+  int PinA0 = 0;
+  int lectura = 0;
+  int Ve = 5; // Tensión en el Arduino.
+  float R1 = 10000;
+  float R2=220 ;
+  
+  VR2=(Ve*R2)/(R1+R2);
+  lectura = analogRead(PinA0);
+  if (lectura)
+  {
+    VR2=(lectura*5.0)/1024.0;
+    Ve = VR2*(R1+R2)/R2;
+    
+    Serial.println(Ve);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("VOLTAJE: ");
+    lcd.print(VOLTAJE,2);     //se imprimie en la lcd con dos decimales
+    lcd.setCursor(0,1);       
+    lcd.print("voltios");
+  }
+}
+
+void procesar_mensaje(float medida)
+{
+  String cadena = Serial.readStringUntil('\n'); // Lee mensaje
+  //String valor = Serial.readStringUntil('\n');  // Lee valor
+  
+  if (cadena.equals("CORRIENTE"))             // Entre las comillas se pone el texto del mensaje que se espera  
+    {
+      float medida; 
+      Serial.println("VALOR_DE_CORRIENTE ");
+      Serial.println(medida);
+                                                     // Acciones asociadas a ese mensaje
+    }
+  else
+   if (cadena.equals("VOLTAJE")) // Y así sucesivamente con todos los posibles mensajes
+    {
+      float medida; 
+      Serial.println("VALOR_DE_VOLTAJE ");
+      Serial.println(medida);
+    }
+  else
+   if(cadena.equals("RESISTENCIA"))
+   {
+      float medida; 
+      Serial.println("VALOR_DE_RESISTENCIA ");
+      Serial.println(medida);    
+   }
+}
